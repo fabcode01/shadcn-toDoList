@@ -103,7 +103,7 @@ export default function Home() {
     <>
       <h1 className="text-center m-5 font-bold">Minhas Tarefas</h1>
 
-    <div className="p-5">
+    <div className="p-3">
       <Table className='border max-w-[800px] m-auto'>
         <TableHeader>
       <TableRow>
