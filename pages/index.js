@@ -1,118 +1,195 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+ 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
 
-const inter = Inter({ subsets: ["latin"] });
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+
+
+
 
 export default function Home() {
+  // lista
+  const[lista, setLista] = useState([])
+
+
+  // Form
+  const[tarefa, setTarefa] = useState([])
+  const[prazo, setPrazo] = useState()
+
+  // State
+  const[showAlert, setShowAlert] = useState('hidden')
+  const[render, SetRender] = useState([])
+
+
+  // addTarefa
+  function addTarefa(tarefaForm, prazoForm){
+    const date = new Date()
+    setPrazo(), 
+    setTarefa()
+
+    // se prazo for undefined setar pro dia atual
+    if(!prazoForm){
+      prazoForm = `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`
+    }
+
+    const tarefa = {
+      
+      id: date.getSeconds(),
+      tarefaForm,
+      criado: `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`,
+      status: 0,
+      prazoForm
+  }
+    
+    if(tarefaForm){
+      setLista([...lista, tarefa])
+      showAlertFunc()
+    }
+
+    console.log(lista)
+  }
+
+
+
+ 
+  // Concluida
+ 
+    const setConcluida = (id) => {
+      lista[id].status = 1
+    };
+    
+    
+  
+
+
+
+
+
+
+
+  function showAlertFunc(){
+    setShowAlert('flex')
+    setTimeout(()=>{
+      setShowAlert('hidden')
+    },2000)
+  }
+  
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <>
+      <h1 className="text-center m-5 font-bold">Minhas Tarefas</h1>
+
+    <div className="p-5">
+      <Table className='border max-w-[800px] m-auto'>
+        <TableHeader>
+      <TableRow>
+        <TableHead className="w-[100px]">Tarefa</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead>Criado</TableHead>
+        <TableHead className="text-right">Prazo</TableHead>
+      </TableRow>
+        </TableHeader>
+        
+        <TableBody>
+      
+        {lista.map((item, index)=>(
+          <TableRow onDoubleClick={()=> setConcluida(index)}  key={index}>
+          <TableCell>{item.tarefaForm}</TableCell>
+
+          <TableCell className={item.status == 0 ? '' : 'text-green-500'}>{item.status == 0 ? 'Pendente' : 'Concluida'}</TableCell>
+
+          <TableCell>{item.criado}</TableCell>
+          <TableCell className='text-end'>{item.prazoForm}</TableCell>
+          </TableRow>
+        ))}
+      
+      
+      
+        </TableBody>
+        <TableCaption>Clique duas vezes na tarefa para marcá-la como concluída.</TableCaption>
+      </Table>
+    </div>
+
+    <div className="flex justify-center">
+    <Dialog>
+      <DialogTrigger asChild>
+      <Button>Adicionar Tarefa</Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Adicione uma tarefa</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="tarefa" className="text-right">
+              Tarefa
+            </Label>
+            <Input required id="tarefa" placeholder='Fazer um bolo' className="col-span-3" onChange={(e)=>setTarefa(e.target.value)}/>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="prazo" className="text-right">
+              Prazo
+            </Label>
+            <Input required id="prazo"
+            type='date'  className="col-span-3" 
+            onChange={(e)=>setPrazo(e.target.value)}
             />
-          </a>
+          </div>
         </div>
+        <DialogFooter>
+
+          {tarefa && <DialogClose>
+            <Button type="submit" onClick={()=>addTarefa(tarefa, prazo)}>
+
+                Adicionar
+            
+            </Button>
+          </DialogClose>}
+          
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+
       </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className={`${showAlert} justify-center mt-10`}>
+        <Alert className='w-2/3'>
+          <AlertTitle className='text-green-700'>Sucesso</AlertTitle>
+          <AlertDescription>
+            Tarefa Adicionada
+          </AlertDescription>
+        </Alert>
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </>
   );
 }
